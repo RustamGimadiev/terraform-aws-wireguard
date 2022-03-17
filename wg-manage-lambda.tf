@@ -125,7 +125,7 @@ module "wg_manage" {
   timeout         = 30
   lambda_role     = aws_iam_role.wg_manage.arn
   package_type    = "Image"
-  image_uri       = var.use_existing_wg_manage_image == true ? var.users_management_type == "iam" ? var.existing_wg_manage_iam_image_name : var.existing_wg_manage_cognito_image_name : module.wg_manage_image[0].image_uri
+  image_uri       = var.users_management_type == "iam" ? var.existing_wg_manage_iam_image_name : var.existing_wg_manage_cognito_image_name
 
   environment_variables = {
     WG_SSM_USERS_PREFIX    = local.wg_ssm_user_prefix
@@ -150,13 +150,3 @@ module "wg_manage" {
     }
   }
 }
-
-module "wg_manage_image" {
-  count           = var.use_existing_wg_manage_image == false ? 1 : 0
-  source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
-  create_ecr_repo = true
-  ecr_repo        = "${local.name}-wg-manage"
-  image_tag       = var.users_management_type == "iam" ? filesha256("${path.module}/lambdas/wg-manage-iam/app.py") : filesha256("${path.module}/lambdas/wg-manage-cognito/app.py")
-  source_path     = var.users_management_type == "iam" ? "${path.module}/lambdas/wg-manage-iam" : "${path.module}/lambdas/wg-manage-cognito"
-}
-

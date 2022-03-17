@@ -125,9 +125,7 @@ module "wg_manage" {
   timeout         = 30
   lambda_role     = aws_iam_role.wg_manage.arn
   package_type    = "Image"
-  image_uri       = var.use_existing_wg_manage_image == true ?
-  var.users_management_type == "iam" ? var.existing_wg_manage_iam_image_name : var.existing_wg_manage_cognito_image_name :
-  module.wg_manage_image.image_uri
+  image_uri       = var.use_existing_wg_manage_image == true ? var.users_management_type == "iam" ? var.existing_wg_manage_iam_image_name : var.existing_wg_manage_cognito_image_name : module.wg_manage_image.image_uri
 
   environment_variables = {
     WG_SSM_USERS_PREFIX    = local.wg_ssm_user_prefix
